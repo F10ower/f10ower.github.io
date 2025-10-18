@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>
+        花间阁
+    </title>
+    
+<link rel="stylesheet" href="/libs/highlight/styles/monokai-sublime.css">
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body id="bodyx">
+    <div class="hd posts">
+    <a href="/index.html"><i class="fa fa-reply replay-btn" aria-hidden="true"></i></a>
+    <div class="post-title">
+        <p>
+            安卓Native层函数注册
+        </p>
+        <hr>
+    </div>
+    <div class="post-content">
+        <p>当执行一个 Java 的 native 方法时，虚拟机是怎么知道该调用 so 中的哪个方法呢？这就需要用到注册的概念了，通过注册，将指定的 native 方法和 so 中对应的方法绑定起来（函数映射表），这样就能够找到相应的方法了。<br>注册分为 <strong>静态注册 和 动态注册</strong>两种。默认的实现方式即静态注册</p>
+<span id="more"></span>
+
+
+
+<h2 id="静态注册"><a href="#静态注册" class="headerlink" title="静态注册"></a>静态注册</h2><p>Java 方法与 C 函数通过<strong>名字规则</strong>自动对应，C&#x2F;C++ 的函数名必须严格遵循命名规范：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">Java_包名_类名_方法名(JNIEnv* env, jobject obj, ...)<br></code></pre></td></tr></table></figure>
+
+<h3 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python">package com.example;<br><br>public <span class="hljs-keyword">class</span> <span class="hljs-title class_">MyClass</span> &#123;<br>    public native void sayHello();<br>    static &#123;<br>        System.loadLibrary(<span class="hljs-string">&quot;native-lib&quot;</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>native代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment">#include &lt;jni.h&gt;</span><br><span class="hljs-comment">#include &lt;stdio.h&gt;</span><br><br>JNIEXPORT void JNICALL<br>Java_com_example_MyClass_sayHello(JNIEnv* env, jobject obj) &#123;<br>    printf(<span class="hljs-string">&quot;Hello from C!\n&quot;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="逆向"><a href="#逆向" class="headerlink" title="逆向"></a>逆向</h3><p>在Java层可以看到Native层注册的函数</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20251013205340.png" alt="image"></p>
+<p>在Native层中，可以看到注册的函数，遵循静态注册的命名规则</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20251013205456.png" alt="image"></p>
+<p>‍</p>
+<h2 id="动态注册"><a href="#动态注册" class="headerlink" title="动态注册"></a>动态注册</h2><p>在本地库加载时（通常在 <code>JNI_OnLoad()</code>），或者在运行时由 C&#x2F;C++ 代码主动调用 <code>RegisterNatives()</code>，把一组 <code>Java 方法名 + 方法签名 + 本地函数指针</code> 映射注册到 JVM，从而让 Java 代码调用这些本地实现。<br>它<strong>不依赖</strong>函数名的固定命名规则（<code>Java_package_Class_method</code>）手动把Java方法和C函数的对应关系注册到JVM</p>
+<p>​<code>JNI_OnLoad(JavaVM* vm, void* reserved)</code> 在 native-lib 被 <code>System.loadLibrary()</code> 时调用</p>
+<h3 id="例子-1"><a href="#例子-1" class="headerlink" title="例子"></a>例子</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.example;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MyClass</span> &#123;<br>    <span class="hljs-keyword">static</span> &#123;<br>        System.loadLibrary(<span class="hljs-string">&quot;native-lib&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-comment">// Java 声明（实例方法）</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">native</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">sayHello</span><span class="hljs-params">()</span>;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">native</span> <span class="hljs-type">int</span> <span class="hljs-title function_">add</span><span class="hljs-params">(<span class="hljs-type">int</span> a, <span class="hljs-type">int</span> b)</span>;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">native</span> String <span class="hljs-title function_">staticEcho</span><span class="hljs-params">(String s)</span>;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br></pre></td><td class="code"><pre><code class="hljs C"><span class="hljs-comment">// file: native_reg.c</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;jni.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string.h&gt;</span></span><br><br><span class="hljs-comment">// 如果是 C++ 编译器，防止函数名被 mangling</span><br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> __cplusplus</span><br><span class="hljs-keyword">extern</span> <span class="hljs-string">&quot;C&quot;</span> &#123;<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br><br><span class="hljs-comment">// -------------------- 本地实现函数 --------------------</span><br><span class="hljs-comment">// 实例方法（对应 Java 的非 static native 方法）</span><br><span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title function_">native_sayHello</span><span class="hljs-params">(JNIEnv* env, jobject thiz)</span> &#123;<br>    <span class="hljs-comment">// 简单打印 —— 注意：Android 上用 printf 可能看不到，建议用 __android_log_print</span><br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;native_sayHello invoked\n&quot;</span>);<br>&#125;<br><br><span class="hljs-comment">// 实例方法：带返回值与参数</span><br><span class="hljs-type">static</span> jint <span class="hljs-title function_">native_add</span><span class="hljs-params">(JNIEnv* env, jobject thiz, jint a, jint b)</span> &#123;<br>    <span class="hljs-keyword">return</span> a + b;<br>&#125;<br><br><span class="hljs-comment">// 静态方法（对应 Java 的 static native 方法）注意第二个参数类型是 jclass</span><br><span class="hljs-type">static</span> jstring <span class="hljs-title function_">native_staticEcho</span><span class="hljs-params">(JNIEnv* env, jclass clazz, jstring js)</span> &#123;<br>    <span class="hljs-type">const</span> <span class="hljs-type">char</span>* s = (*env)-&gt;GetStringUTFChars(env, js, <span class="hljs-literal">NULL</span>);<br>    <span class="hljs-keyword">if</span> (s == <span class="hljs-literal">NULL</span>) &#123; <span class="hljs-comment">// OOM or other error</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>    &#125;<br>    <span class="hljs-comment">// 这里可以处理字符串，演示直接返回一个新字符串</span><br>    jstring ret = (*env)-&gt;NewStringUTF(env, s);<br>    (*env)-&gt;ReleaseStringUTFChars(env, js, s);<br>    <span class="hljs-keyword">return</span> ret;<br>&#125;<br><br><span class="hljs-comment">// -------------------- 方法表：Java 名称、签名、C 函数指针 --------------------</span><br><span class="hljs-type">static</span> JNINativeMethod methods[] = &#123;<br>    <span class="hljs-comment">// &#123; &quot;Java 方法名&quot;, &quot;JNI 签名&quot;, (void*)本地函数指针 &#125;</span><br>    &#123;<span class="hljs-string">&quot;sayHello&quot;</span>, <span class="hljs-string">&quot;()V&quot;</span>, (<span class="hljs-type">void</span>*)native_sayHello&#125;,<br>    &#123;<span class="hljs-string">&quot;add&quot;</span>, <span class="hljs-string">&quot;(II)I&quot;</span>, (<span class="hljs-type">void</span>*)native_add&#125;,<br>    &#123;<span class="hljs-string">&quot;staticEcho&quot;</span>, <span class="hljs-string">&quot;(Ljava/lang/String;)Ljava/lang/String;&quot;</span>, (<span class="hljs-type">void</span>*)native_staticEcho&#125;<br>&#125;;<br><br><span class="hljs-comment">// 辅助：计算方法表大小</span><br><span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-type">int</span> methods_count = <span class="hljs-keyword">sizeof</span>(methods) / <span class="hljs-keyword">sizeof</span>(methods[<span class="hljs-number">0</span>]);<br><br><span class="hljs-comment">// -------------------- 注册函数（封装 RegisterNatives） --------------------</span><br><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">register_native_methods</span><span class="hljs-params">(JNIEnv* env)</span> &#123;<br>    <span class="hljs-comment">// 注意：这里的类路径使用斜杠，不使用点号</span><br>    <span class="hljs-type">const</span> <span class="hljs-type">char</span>* kClassPathName = <span class="hljs-string">&quot;com/example/MyClass&quot;</span>;<br>    jclass clazz = (*env)-&gt;FindClass(env, kClassPathName);<br>    <span class="hljs-keyword">if</span> (clazz == <span class="hljs-literal">NULL</span>) &#123;<br>        <span class="hljs-comment">// 如果 FindClass 失败，打印并清理异常（如果有）</span><br>        <span class="hljs-keyword">if</span> ((*env)-&gt;ExceptionCheck(env)) &#123;<br>            (*env)-&gt;ExceptionDescribe(env);<br>            (*env)-&gt;ExceptionClear(env);<br>        &#125;<br>        <span class="hljs-keyword">return</span> JNI_FALSE;<br>    &#125;<br><br>    <span class="hljs-comment">// RegisterNatives 返回 &lt; 0 表示失败</span><br>    <span class="hljs-keyword">if</span> ((*env)-&gt;RegisterNatives(env, clazz, methods, methods_count) &lt; <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-keyword">if</span> ((*env)-&gt;ExceptionCheck(env)) &#123;<br>            (*env)-&gt;ExceptionDescribe(env);<br>            (*env)-&gt;ExceptionClear(env);<br>        &#125;<br>        <span class="hljs-keyword">return</span> JNI_FALSE;<br>    &#125;<br><br>    <span class="hljs-comment">// 如果你需要长期引用这个 jclass，应该创建全局引用：</span><br>    <span class="hljs-comment">// jclass globalClazz = (*env)-&gt;NewGlobalRef(env, clazz);</span><br>    <span class="hljs-comment">// 然后存储 globalClazz 供以后使用，并在卸载时 DeleteGlobalRef。</span><br>    <span class="hljs-keyword">return</span> JNI_TRUE;<br>&#125;<br><br><span class="hljs-comment">// -------------------- JNI_OnLoad：库被 System.loadLibrary 时 JVM 调用 --------------------</span><br>JNIEXPORT jint JNICALL <span class="hljs-title function_">JNI_OnLoad</span><span class="hljs-params">(JavaVM* vm, <span class="hljs-type">void</span>* reserved)</span> &#123;<br>    JNIEnv* env = <span class="hljs-literal">NULL</span>;<br><br>    <span class="hljs-comment">// 获取 JNIEnv 指针 —— 注意线程安全与返回值检查</span><br>    <span class="hljs-keyword">if</span> ((*vm)-&gt;GetEnv(vm, (<span class="hljs-type">void</span>**)&amp;env, JNI_VERSION_1_6) != JNI_OK) &#123;<br>        <span class="hljs-keyword">return</span> JNI_ERR; <span class="hljs-comment">// 表示加载失败</span><br>    &#125;<br><br>    <span class="hljs-comment">// 注册 native 方法（通常在这里做，但 Android 情况见后文）</span><br>    <span class="hljs-keyword">if</span> (!register_native_methods(env)) &#123;<br>        <span class="hljs-keyword">return</span> JNI_ERR; <span class="hljs-comment">// 注册失败，返回错误使加载失败</span><br>    &#125;<br><br>    <span class="hljs-comment">// 返回所支持的 JNI 版本</span><br>    <span class="hljs-keyword">return</span> JNI_VERSION_1_6;<br>&#125;<br><br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> __cplusplus</span><br>&#125; <span class="hljs-comment">// extern &quot;C&quot;</span><br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br><br></code></pre></td></tr></table></figure>
+
+<p>注意，这里的register_native_methods并不是必须要写的，它的作用只是让代码结构更清晰</p>
+<p>一个典型的辅助函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs C"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">register_native_methods</span><span class="hljs-params">(JNIEnv* env, <span class="hljs-type">const</span> <span class="hljs-type">char</span>* className, JNINativeMethod* methods, <span class="hljs-type">int</span> numMethods)</span> &#123;<br>    jclass clazz = (*env)-&gt;FindClass(env, className);<br>    <span class="hljs-keyword">if</span> (clazz == <span class="hljs-literal">NULL</span>) &#123;<br>        <span class="hljs-keyword">return</span> JNI_FALSE;<br>    &#125;<br>    <span class="hljs-keyword">if</span> ((*env)-&gt;RegisterNatives(env, clazz, methods, numMethods) &lt; <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-keyword">return</span> JNI_FALSE;<br>    &#125;<br>    <span class="hljs-keyword">return</span> JNI_TRUE;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>而Jni_Onload是必须的</p>
+<p>在Java层执行system.loadLibrary的时候被Jvm自动调用，当 native 库被加载时，完成初始化，比如注册 native 函数。</p>
+<p>JNI_OnLoad的标准写法</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs C">JNIEXPORT jint JNICALL <span class="hljs-title function_">JNI_OnLoad</span><span class="hljs-params">(JavaVM* vm, <span class="hljs-type">void</span>* reserved)</span><br>&#123;<br>    JNIEnv* env = <span class="hljs-literal">NULL</span>;<br><br>    <span class="hljs-comment">// 1. 获取 JNIEnv 指针</span><br>    <span class="hljs-keyword">if</span> ((*vm)-&gt;GetEnv(vm, (<span class="hljs-type">void</span>**)&amp;env, JNI_VERSION_1_6) != JNI_OK) &#123;<br>        <span class="hljs-keyword">return</span> JNI_ERR;<br>    &#125;<br><br>    <span class="hljs-comment">// 2. 调用自己写的注册函数（可选）</span><br>    <span class="hljs-keyword">if</span> (!register_native_methods(env, <span class="hljs-string">&quot;com/example/MyClass&quot;</span>, methods, <span class="hljs-keyword">sizeof</span>(methods) / <span class="hljs-keyword">sizeof</span>(methods[<span class="hljs-number">0</span>]))) &#123;<br>        <span class="hljs-keyword">return</span> JNI_ERR;<br>    &#125;<br><br>    <span class="hljs-comment">// 3. 返回 JNI 版本号（必须）</span><br>    <span class="hljs-keyword">return</span> JNI_VERSION_1_6;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>在动态注册中，核心函数是</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs C">jint <span class="hljs-title function_">RegisterNatives</span><span class="hljs-params">(JNIEnv* env, jclass clazz, <span class="hljs-type">const</span> JNINativeMethod* methods, jint nMethods)</span>;<br></code></pre></td></tr></table></figure>
+
+<p>注意，这个methods参数，是一个数组，类型为</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs C"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span><br>    <span class="hljs-type">const</span> <span class="hljs-type">char</span>* name;       <span class="hljs-comment">// Java 方法名</span><br>    <span class="hljs-type">const</span> <span class="hljs-type">char</span>* signature;  <span class="hljs-comment">// Java 方法签名（描述参数与返回值类型）</span><br>    <span class="hljs-type">void</span>* fnPtr;            <span class="hljs-comment">// 对应的 C 函数指针</span><br>&#125; JNINativeMethod;<br></code></pre></td></tr></table></figure>
+
+<p>如果不传这个表，RegisterNatives()就不知道在注册什么东西</p>
+<p>所以也就是说，从逻辑上来看，方法表是一个必须的东西</p>
+<p>方法表的结构如下</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs C"><span class="hljs-type">static</span> JNINativeMethod methods[] = &#123;<br>    &#123;<span class="hljs-string">&quot;sayHello&quot;</span>, <span class="hljs-string">&quot;()V&quot;</span>, (<span class="hljs-type">void</span>*)native_sayHello&#125;,<br>    &#123;<span class="hljs-string">&quot;add&quot;</span>, <span class="hljs-string">&quot;(II)I&quot;</span>, (<span class="hljs-type">void</span>*)native_add&#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>“sayHello”这个字段表示函数名</p>
+<p>“()V”这个字段表示void</p>
+<p>(void*)native_sayHello字段表示函数地址</p>
+<p>第二个字段的常见签名方法如下</p>
+<p>Java 类型 -&gt; JNI 签名</p>
+<ul>
+<li>​<code>void</code> -&gt; <code>V</code>​</li>
+<li>​<code>boolean</code> -&gt; <code>Z</code>​</li>
+<li>​<code>byte</code> -&gt; <code>B</code>​</li>
+<li>​<code>char</code> -&gt; <code>C</code>​</li>
+<li>​<code>short</code> -&gt; <code>S</code>​</li>
+<li>​<code>int</code> -&gt; <code>I</code>​</li>
+<li>​<code>long</code> -&gt; <code>J</code>​</li>
+<li>​<code>float</code> -&gt; <code>F</code>​</li>
+<li>​<code>double</code> -&gt; <code>D</code>​</li>
+<li>​<code>Object</code> -&gt; <code>Lfull/package/ClassName;</code> （包名用 <code>/</code>，例如 <code>Ljava/lang/String;</code>）</li>
+<li>​<code>int[]</code> -&gt; <code>[I</code>、<code>String[]</code> -&gt; <code>[Ljava/lang/String;</code>​</li>
+</ul>
+<p>举例：</p>
+<ul>
+<li>​<code>void foo()</code> -&gt; <code>()V</code>​</li>
+<li>​<code>int sum(int a, int b)</code> -&gt; <code>(II)I</code>​</li>
+<li>​<code>String process(String s, int[] arr)</code> -&gt; <code>(Ljava/lang/String;[I)Ljava/lang/String;</code>​</li>
+</ul>
+<p>‍</p>
+<h3 id="逆向-1"><a href="#逆向-1" class="headerlink" title="逆向"></a>逆向</h3><p>同样可以看到注册了个native函数</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20251013213415.png" alt="image"></p>
+<p>到了native层，可以发现大不同了</p>
+<p>首先可以看到JNI_Onload函数，看不到静态注册格式命名的函数名了</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20251013214105.png" alt="image"></p>
+<p>那么应该怎样看动态注册了哪些函数呢</p>
+<p>还记得吗，在源码中，我们是写了一个“函数表”的</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20251013214246.png" alt="image"></p>
+<p>在IDA中，如果没去符号表，是可以看到的</p>
+<p>我们点进去，就可以看到动态注册了哪些函数了</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20251013214313.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20251013214347.png" alt="image"></p>
+<p>‍</p>
+
+    </div>
+
+    
+</div>
+    <div class="footer" id="footer">
+    <p>Copyright © 2020 <a class="flink" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a>-<a class="flink" target="_blank" rel="noopener" href="https://github.com/sanjinhub/hexo-theme-geek">Geek</a>.
+        <label class="el-switch el-switch-green el-switch-sm" style="vertical-align: sub;">
+            <input type="checkbox" name="switch" id="update_style">
+            <span class="el-switch-style"></span>
+        </label>
+<!--         <script type="text/javascript">
+        var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");
+        document.write(unescape("%3Cspan id='cnzz_stat_icon_1278548644'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/stat.php%3Fid%3D1278548644%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+        </script> -->
+    </p>
+</div>
+<input type="hidden" id="web_style" value="black">
+<input type="hidden" id="valine_appid" value="CmCti21ooOOIzFOhEyFkFvR0-gzGzoHsz">
+<input type="hidden" id="valine_appKey" value="FqiyUqbg7McKN2eG0MCewupf">
+
+<script src="/libs/jquery.min.js"></script>
+
+
+<script src="/libs/highlight/highlight.pack.js"></script>
+
+<script src='//cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+
+<script src="/js/js.js"></script>
+
+<style type="text/css">
+.v * {
+    color: #698fca;
+}
+
+.v .vlist .vcard .vhead .vsys {
+    color: #3a3e4a;
+}
+
+.v .vlist .vcard .vh .vmeta .vat {
+    color: #638fd5;
+}
+
+.v .vlist .vcard .vhead .vnick {
+    color: #6ba1ff;
+}
+
+.v a {
+    color: #8696b1;
+}
+
+.v .vlist .vcard .vhead .vnick:hover {
+    color: #669bfc;
+}
+</style>
+</body>
+
+</html>
