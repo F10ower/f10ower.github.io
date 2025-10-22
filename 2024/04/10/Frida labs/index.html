@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf8" />
+    <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+    <title>
+      
+        Frida操作大全 | 临江仙的花间阁
+      
+    </title>
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    
+      <link rel="apple-touch-icon"
+            sizes="180x180"
+            href="/images/apple-touch-icon.png" />
+    
+    
+      <link rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="/images/logo-32.png" />
+    
+    
+      <link rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="/images/logo-16.png" />
+    
+    
+      <link rel="mask-icon"
+            href="/images/1.svg"
+            color="" />
+    
+    
+    
+      
+  <style>
+    @font-face {
+        font-family:sourceHanSerif;
+        src: url(/font/normal.ttf);
+        font-weight: normal;
+    }
+  </style>
+
+  <style>
+    @font-face {
+        font-family:sourceHanSerif;
+        src: url(/font/bold.ttf);
+        font-weight: bold;
+    }
+  </style>
+
+
+    
+    <link rel="stylesheet"
+          type="text/css"
+          href='/css/layout.css' />
+    
+    
+  <link rel="stylesheet" type="text/css" href="/css/post.css"/>
+  
+
+  <meta name="generator" content="Hexo 7.3.0"></head>
+  <body>
+    
+      <div id="search-mask" style="display:none">
+  <div class="search-main" id="search-main">
+    <div class="search__head">
+      <div class="search-form">
+        <svg t="1706347533072"
+             class="icon"
+             viewBox="0 0 1024 1024"
+             version="1.1"
+             xmlns="http://www.w3.org/2000/svg"
+             p-id="7828"
+             width="20"
+             height="20">
+          <path d="M685.6 660.336l155.152 155.168a16 16 0 0 1 0 22.624l-11.312 11.328a16 16 0 0 1-22.624 0l-158.528-158.544a289.792 289.792 0 0 1-165.152 51.36C322.336 742.256 192 611.904 192 451.12 192 290.336 322.336 160 483.136 160c160.784 0 291.12 130.336 291.12 291.136 0 82.112-33.984 156.272-88.672 209.2z m-202.464 33.92c134.272 0 243.12-108.848 243.12-243.12C726.256 316.848 617.408 208 483.136 208 348.848 208 240 316.848 240 451.136c0 134.272 108.848 243.12 243.136 243.12z" fill="#000000" p-id="7829">
+          </path>
+        </svg>
+        <input id="search-input" placeholder="搜索文章">
+        <svg t="1706361500528"
+             id="search-clear"
+             class="icon"
+             viewBox="0 0 1024 1024"
+             version="1.1"
+             xmlns="http://www.w3.org/2000/svg"
+             p-id="4351"
+             width="20"
+             height="20">
+          <path d="M512 562.688l-264.2944 264.2944-50.688-50.688L461.312 512 197.0176 247.7056l50.688-50.688L512 461.312l264.2944-264.2944 50.688 50.688L562.688 512l264.2944 264.2944-50.688 50.688L512 562.688z" fill="#00" p-id="4352">
+          </path>
+        </svg>
+      </div>
+    </div>
+    <div class="search__body" id="search-result"></div>
+    <div class="search__foot"></div>
+  </div>
+</div>
+
+    
+    <div class="head">
+      <div class="nav">
+        <a href='/' class="nav-logo">
+          <img alt="logo" height="60px" width="60px" src="/images/1.svg" />
+        </a>
+        <input id="navBtn" type="checkbox" />
+        <div class="nav-right">
+          
+            <div class="search-outer">
+  <div class="search" id="search-btn">
+    <svg t="1706347533072"
+         class="icon"
+         viewBox="0 0 1024 1024"
+         version="1.1"
+         xmlns="http://www.w3.org/2000/svg"
+         p-id="7828"
+         width="20"
+         height="20">
+      <path d="M685.6 660.336l155.152 155.168a16 16 0 0 1 0 22.624l-11.312 11.328a16 16 0 0 1-22.624 0l-158.528-158.544a289.792 289.792 0 0 1-165.152 51.36C322.336 742.256 192 611.904 192 451.12 192 290.336 322.336 160 483.136 160c160.784 0 291.12 130.336 291.12 291.136 0 82.112-33.984 156.272-88.672 209.2z m-202.464 33.92c134.272 0 243.12-108.848 243.12-243.12C726.256 316.848 617.408 208 483.136 208 348.848 208 240 316.848 240 451.136c0 134.272 108.848 243.12 243.136 243.12z" fill="#000000" p-id="7829">
+      </path>
+    </svg>
+    <span>搜索</span>
+    <span class="search-shortcut-key">Ctrl K</span>
+  </div>
+</div>
+
+          
+          <div class="nav-menu">
+            
+              
+                <a class="nav-menu-item" href="/feat">古文</a>
+              
+                <a class="nav-menu-item" href="/base">逆向</a>
+              
+            
+            
+          </div>
+        </div>
+        <label class="nav-btn" for="navBtn"></label>
+      </div>
+    </div>
+    <div class="body">
+      
+  <article class="post-content">
+    <div class="post-inner">
+      <div class="post-content__head">
+        <div class="post-title">Frida操作大全</div>
+        <div class="post-info">
+          
+  <a href="/tags/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/" class="post-tag">#移动安全</a>
+
+
+          <span class="post-date">2024-04-10</span>
+        </div>
+      </div>
+      
+      <div class="post-content__body">
+        
+          <div class="post-gallery">
+            
+          </div>
+        
+        <p>Frida Labs全解</p>
+<span id="more"></span>
+<h1 id="Frida-labs"><a href="#Frida-labs" class="headerlink" title="Frida labs"></a>Frida labs</h1><h2 id="参数解释"><a href="#参数解释" class="headerlink" title="参数解释"></a>参数解释</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs js">-U 指定<span class="hljs-variable constant_">USB</span>设备<br>-f 指定app包名，通过spawn方式启动（就是重新启动的意思）<br>-P 指定<span class="hljs-variable constant_">APP</span>的pid<br>--no-pause 不暂停<br>-l 加载hook脚本<br></code></pre></td></tr></table></figure>
+
+<p>‍</p>
+<h2 id="0x1-Hook修改被调用的方法的逻辑，返回值，传入参数"><a href="#0x1-Hook修改被调用的方法的逻辑，返回值，传入参数" class="headerlink" title="0x1 Hook修改被调用的方法的逻辑，返回值，传入参数"></a>0x1 Hook修改被调用的方法的逻辑，返回值，传入参数</h2><p>使用随机数，对输入进行判断，如果输入数的满足一个表达式，就会打印出flag</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250413221718.png" alt="image"></p>
+<p>于是这里就有两种思路了。第一种是 hook get_random 函数，让该函数的返回值变成一个固定的值，从而计算表达式的值</p>
+<p>第二种思路是 hook check 函数，直接将我们自己定义的值传入进去</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">hook</span>(<span class="hljs-params"></span>) &#123;<br><br>    <span class="hljs-keyword">var</span> <span class="hljs-title class_">MainActivity</span> = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;com.ad2001.frida0x1.MainActivity&quot;</span>); <span class="hljs-comment">//使用 Frida 的 Java.use() 方法获取目标类 MainActivity 的引用。</span><br>    <span class="hljs-title class_">MainActivity</span>.<span class="hljs-property">get_random</span>.<span class="hljs-property">implementation</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123; <span class="hljs-comment">//implementation 在 Frida 中是一个关键属性，用于覆盖原始 Java 方法的实现</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>    &#125;<br>&#125;<br><br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">hook2</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">var</span> <span class="hljs-title class_">MainActivity</span> = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;com.ad2001.frida0x1.MainActivity&quot;</span>);<br>    <span class="hljs-title class_">MainActivity</span>.<span class="hljs-property">check</span>.<span class="hljs-title function_">overload</span>(<span class="hljs-string">&#x27;int&#x27;</span>, <span class="hljs-string">&#x27;int&#x27;</span>).<span class="hljs-property">implementation</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">a, b</span>) &#123; <span class="hljs-comment">//overload用于指定参数，由于Java的方法可以重载，所以需要指定</span><br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Origin i and i2 = &quot;</span>, a, b); <span class="hljs-comment">//console.log打印</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">check</span>(<span class="hljs-number">3</span>, b); <span class="hljs-comment">//我们自己将 i 的值定为 3 传入进去</span><br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br><br>    <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">perform</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-title function_">hook2</span>();<br>    &#125;)<br>&#125;<br><br><span class="hljs-title function_">setImmediate</span>(main);<br></code></pre></td></tr></table></figure>
+
+<p>注入</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js">frida -U -f com.<span class="hljs-property">ad2001</span>.<span class="hljs-property">frida0x1</span> -l hook.<span class="hljs-property">js</span><br></code></pre></td></tr></table></figure>
+
+<p>-U -f 缺一不可</p>
+<p>为什么</p>
+<p>缺少 -f</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash">C:\Users\29660\Desktop\Frida\Frida-Labs-main\Frida-Labs-main\Frida 0x1&gt;frida -U com.ad2001.frida0x1 -l hook.js<br>     ____<br>    / _  |   Frida 16.4.10 - A world-class dynamic instrumentation toolkit<br>   | (_| |<br>    &gt; _  |   Commands:<br>   /_/ |_|       <span class="hljs-built_in">help</span>      -&gt; Displays the <span class="hljs-built_in">help</span> system<br>   . . . .       object?   -&gt; Display information about <span class="hljs-string">&#x27;object&#x27;</span><br>   . . . .       <span class="hljs-built_in">exit</span>/quit -&gt; Exit<br>   . . . .<br>   . . . .   More info at https://frida.re/docs/home/<br>   . . . .<br>   . . . .   Connected to Android Emulator 5554 (<span class="hljs-built_in">id</span>=emulator-5554)<br>Failed to spawn: unable to find process with name <span class="hljs-string">&#x27;com.ad2001.frida0x1&#x27;</span> <br></code></pre></td></tr></table></figure>
+
+<p>Failed to spawn: unable to find process with name ‘com.ad2001.frida0x1’表示没有Frida <strong>找不到名为</strong> <strong>​<code>com.ad2001.frida0x1</code>​</strong> <strong>的进程，详见lab02</strong></p>
+<p>‍</p>
+<p>缺少-U</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash">C:\Users\29660\Desktop\Frida\Frida-Labs-main\Frida-Labs-main\Frida 0x1&gt;frida -f com.ad2001.frida0x1 -l hook.js<br>     ____<br>    / _  |   Frida 16.4.10 - A world-class dynamic instrumentation toolkit<br>   | (_| |<br>    &gt; _  |   Commands:<br>   /_/ |_|       <span class="hljs-built_in">help</span>      -&gt; Displays the <span class="hljs-built_in">help</span> system<br>   . . . .       object?   -&gt; Display information about <span class="hljs-string">&#x27;object&#x27;</span><br>   . . . .       <span class="hljs-built_in">exit</span>/quit -&gt; Exit<br>   . . . .<br>   . . . .   More info at https://frida.re/docs/home/<br>   . . . .<br>   . . . .   Connected to Local System (<span class="hljs-built_in">id</span>=<span class="hljs-built_in">local</span>)<br>Failed to spawn: unable to find executable at <span class="hljs-string">&#x27;com.ad2001.frida0x1&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p>说明 Frida <strong>没有连接到 Android 模拟器</strong>，而是连接到了你本地电脑（Windows），所以它以为是要在本地运行一个叫 <code>com.ad2001.frida0x1</code> 的可执行文件。</p>
+<p>‍</p>
+<h2 id="0x2-Hook调用静态的未被调用的方法"><a href="#0x2-Hook调用静态的未被调用的方法" class="headerlink" title="0x2 Hook调用静态的未被调用的方法"></a>0x2 Hook调用静态的未被调用的方法</h2><p>可以看到这里定义了一个 get_flag 方法，但是并没有在主函数中被调用</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250413222107.png" alt="image"></p>
+<p>使用 frida 直接调用未被调用的静态方法</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-title function_">setImmediate</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br><br>    <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">perform</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br><br>        <span class="hljs-keyword">var</span> a = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;com.ad2001.frida0x2.MainActivity&quot;</span>)<br>        a.<span class="hljs-title function_">get_flag</span>(<span class="hljs-number">4919</span>);<br><br>    &#125;)<br><br>&#125;)<br><br><br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">hook</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">var</span> <span class="hljs-title class_">MainActivity</span> = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;com.ad2001.frida0x2.MainActivity&quot;</span>);<br>    <span class="hljs-title class_">MainActivity</span>.<span class="hljs-title function_">get_flag</span>(<span class="hljs-number">4919</span>);<br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">perform</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-title function_">hook</span>();<br>    &#125;)<br>&#125;<br><br><span class="hljs-title function_">setImmediate</span>(main);<br></code></pre></td></tr></table></figure>
+
+<p>hook的时候使用如下命令有可能会hook不上</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js">frida -U -f com.<span class="hljs-property">ad2001</span>.<span class="hljs-property">frida0x2</span> -l hook.<span class="hljs-property">js</span><br></code></pre></td></tr></table></figure>
+
+<p>原因是setImmediate(main);是程序启动后立即注入，可能会导致程序还没完全启动就注入了，所以hook不上</p>
+<p>解决办法是使用</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js">frida -U <span class="hljs-string">&#x27;frida 0x2&#x27;</span> -l hook.<span class="hljs-property">js</span><br></code></pre></td></tr></table></figure>
+
+<p>那么，为什么将frida 0x2写成包名com.ad2001.frida0x2就不行呢</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js">frida -U com.<span class="hljs-property">ad2001</span>.<span class="hljs-property">frida0x2</span> -l hook.<span class="hljs-property">js</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250411160833.png" alt="image"></p>
+<p>这个命令尝试的是：<strong>根据包名注入，默认是 spawn（启动）模式</strong>。</p>
+<p>实际上这条命令是尝试 <strong>spawn（启动）包名对应的 app</strong>，但没写 <code>-f</code>，它又不是 attach 模式，就会失败。</p>
+<p>或者将hook代码中的</p>
+<p>setImmediate(main);改成</p>
+<p>setTimeout(main,1000);延迟启动</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">hook</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">var</span> <span class="hljs-title class_">MainActivity</span> = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;com.ad2001.frida0x2.MainActivity&quot;</span>);<br>    <span class="hljs-title class_">MainActivity</span>.<span class="hljs-title function_">get_flag</span>(<span class="hljs-number">4919</span>);<br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">perform</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-title function_">hook</span>();<br>    &#125;)<br>&#125;<br><br><span class="hljs-comment">// setImmediate(main);</span><br><span class="hljs-built_in">setTimeout</span>(main, <span class="hljs-number">1000</span>);<br></code></pre></td></tr></table></figure>
+
+<p>‍</p>
+<h2 id="0x3-更改类中的静态变量"><a href="#0x3-更改类中的静态变量" class="headerlink" title="0x3 更改类中的静态变量"></a>0x3 更改类中的静态变量</h2><p>hook code的值</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250411171349.png" alt="image"></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">hook</span>(<span class="hljs-params"></span>) &#123;<br>    <br>    <span class="hljs-keyword">var</span> a = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;com.ad2001.frida0x3.Checker&quot;</span>) <span class="hljs-comment">//code的值在Checker类里</span><br>    a.<span class="hljs-property">code</span>.<span class="hljs-property">value</span> = <span class="hljs-number">512</span>; <span class="hljs-comment">//使用这一句修改静态变量的值</span><br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br>    <br>    <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">perform</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-title function_">hook</span>();<br>    &#125;)<br>&#125;<br><br><span class="hljs-title function_">setImmediate</span>(main);<br></code></pre></td></tr></table></figure>
+
+<p>思考：</p>
+<p>a是什么</p>
+<p>a.code.value具体是什么意思</p>
+<p>以下内容来自GPT</p>
+<blockquote>
+<p>在这段 Frida 脚本中：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">var</span> a = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;com.ad2001.frida0x3.Checker&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<h3 id="a-是什么？"><a href="#a-是什么？" class="headerlink" title="a 是什么？"></a><code>a</code> 是什么？</h3><p>👉 <strong>​<code>a</code>​</strong> <strong>是一个 Frida 创建的 Java 类代理对象（Java class wrapper）</strong> ，你可以把它当成是一个“控制器”或者“代理”，用来访问和操作 Java 中的类 <code>com.ad2001.frida0x3.Checker</code> 的静态字段、静态方法、实例方法，甚至可以 hook 它的方法。</p>
+<hr>
+<h3 id="类比一下："><a href="#类比一下：" class="headerlink" title="类比一下："></a>类比一下：</h3><p>在 Java 代码中你可能会这样用一个类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">Checker.code = <span class="hljs-number">512</span>;<br></code></pre></td></tr></table></figure>
+
+<p>在 Frida 中，为了达到类似的效果，我们写：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">var</span> a = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;com.ad2001.frida0x3.Checker&quot;</span>)<br>a.<span class="hljs-property">code</span>.<span class="hljs-property">value</span> = <span class="hljs-number">512</span>;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="更具体地说："><a href="#更具体地说：" class="headerlink" title="更具体地说："></a>更具体地说：</h3><ul>
+<li><p>​<code>Java.use(&quot;...&quot;)</code> 会返回一个 <strong>Frida 的 Java 类接口（wrapper）</strong></p>
+</li>
+<li><p>这个对象不是类的一个实例，而是一个可以操作 <strong>类本身（静态成员）或创建实例</strong> 的对象。</p>
+</li>
+<li><p>如果你需要创建类的实例，你可以这样写：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">var</span> instance = a.$new();  <span class="hljs-comment">// 等于 Java 里的 new Checker()</span><br></code></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h3 id="所以总结一下："><a href="#所以总结一下：" class="headerlink" title="所以总结一下："></a>所以总结一下：</h3><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>​<code>a</code>​</td>
+<td>Frida 中的类包装对象，表示<code>Checker</code>类</td>
+</tr>
+<tr>
+<td>​<code>a.code.value</code>​</td>
+<td>表示访问并修改类中<code>code</code>这个静态字段的值</td>
+</tr>
+<tr>
+<td>​<code>a.$new()</code>​</td>
+<td>（可选）表示创建这个类的一个新实例</td>
+</tr>
+</tbody></table>
+</blockquote>
+<p>‍</p>
+<h2 id="0x4-调用非MainActivity-非静态方法"><a href="#0x4-调用非MainActivity-非静态方法" class="headerlink" title="0x4 调用非MainActivity,非静态方法"></a>0x4 调用非MainActivity,非静态方法</h2><p>​<code>MainActivity</code>里没有任何东西</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250412170532.png" alt="image"></p>
+<p>定义了一个Check类，里面有get_flag方法</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250412170610.png" alt="image"></p>
+<p>想调用这个get_flag方法，必须实例化一个check类对象，在frida中可以用以下脚本实现</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">hook</span>(<span class="hljs-params"></span>) &#123;<br>    <br>    <span class="hljs-keyword">var</span> c = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;com.ad2001.frida0x4.Check&quot;</span>);<br>    <span class="hljs-keyword">var</span> c_check = c.$new();   <span class="hljs-comment">//实例化check类对象 相当于Java里写 c c_check = new c();</span><br> <br>    <span class="hljs-keyword">var</span> flag = c_check.<span class="hljs-title function_">get_flag</span>(<span class="hljs-number">1337</span>);<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(flag);<br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br>    <br>    <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">perform</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>        <br>        <span class="hljs-title function_">hook</span>();<br>    &#125;)<br>&#125;<br><br><span class="hljs-title function_">setImmediate</span>(main);<br></code></pre></td></tr></table></figure>
+
+<p>运行结果如下</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250412170950.png" alt="image"></p>
+<h2 id="0x5-调用MainActivity中的非静态方法"><a href="#0x5-调用MainActivity中的非静态方法" class="headerlink" title="0x5 调用MainActivity中的非静态方法"></a>0x5 调用MainActivity中的非静态方法</h2><p>在 0x2 中，我们使用frida调用了静态方法</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250413192625.png" alt="image"></p>
+<p>但在本次，这是一个非静态方法</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250413192705.png" alt="image"></p>
+<p>Java中静态方法可以直接调用，而非静态方法必须实例化一个对象之后才能调用</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs js">public <span class="hljs-keyword">class</span> <span class="hljs-title class_">Hello</span> &#123;<br><br>    <span class="hljs-comment">// 静态方法</span><br>    public <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">sayStatic</span>(<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-title class_">System</span>.<span class="hljs-property">out</span>.<span class="hljs-title function_">println</span>(<span class="hljs-string">&quot;我是静态方法&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-comment">// 非静态方法</span><br>    public <span class="hljs-keyword">void</span> <span class="hljs-title function_">sayInstance</span>(<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-title class_">System</span>.<span class="hljs-property">out</span>.<span class="hljs-title function_">println</span>(<span class="hljs-string">&quot;我是非静态方法&quot;</span>);<br>    &#125;<br><br>    public <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"><span class="hljs-built_in">String</span>[] args</span>) &#123;<br>        <span class="hljs-comment">// 调用静态方法：不需要创建对象</span><br>        <span class="hljs-title class_">Hello</span>.<span class="hljs-title function_">sayStatic</span>();<br><br>        <span class="hljs-comment">// 调用非静态方法：必须先创建对象</span><br>        <span class="hljs-title class_">Hello</span> h = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Hello</span>();<br>        h.<span class="hljs-title function_">sayInstance</span>();<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>我们直接用 0x2 的脚本hook一下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">hook</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">var</span> <span class="hljs-title class_">MainActivity</span> = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;com.ad2001.frida0x5.MainActivity&quot;</span>);<br>    <span class="hljs-title class_">MainActivity</span>.<span class="hljs-title function_">flag</span>(<span class="hljs-number">1337</span>);<br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">perform</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-title function_">hook</span>();<br>    &#125;)<br>&#125;<br><br><span class="hljs-title function_">setImmediate</span>(main);<br></code></pre></td></tr></table></figure>
+
+<p>哦豁，报错了</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250413194308.png" alt="image"></p>
+<p>以下解释来自SWDD师傅</p>
+<blockquote>
+<p>直接使用Frida创建MainActivity或任何Android组件可能会很棘手，因为Android的生命周期和线程规则。Android组件，如Activity子类，依赖于应用程序上下文进行正确运行。在Frida中，您可能缺少必要的上下文。Android UI组件通常需要具有关联Looper的特定线程。如果涉及UI任务，请确保在具有活动Looper的主线程上执行。活动是较大的Android应用程序生命周期的一部分。创建MainActivity的实例可能需要应用处于特定状态，并且通过Frida管理整个生命周期可能并不直接。总之，为MainActivity创建实例并不是一个好主意。</p>
+</blockquote>
+<p>通俗点来说就是，</p>
+<blockquote>
+<p><strong>用Frida直接创建 MainActivity 或其他 Android 组件（比如 Activity）是很麻烦的，甚至是不可行的。</strong></p>
+</blockquote>
+<p>原因是这样的：</p>
+<ol>
+<li><strong>Activity 需要上下文（Context）才能正常工作</strong>：就像你造房子要有地基一样，Activity 这种组件运行的时候，需要依赖应用程序提供的运行环境（就是 Context）。在 Frida 里，你是“旁观者”，而不是“房子的主人”，所以没法轻松提供这个环境。</li>
+<li><strong>UI 相关的代码必须在主线程（带 Looper 的线程）里跑</strong>：Android 要求所有跟界面有关的操作都得在“主线程”里运行，这个线程有个叫 Looper 的消息循环系统。在 Frida 里，如果你随便在哪个线程里跑 UI 代码，程序很可能直接崩掉。</li>
+<li><strong>Activity 的生命周期很复杂</strong>：系统会自动帮 Activity 调用一系列方法，比如 onCreate、onStart、onResume 等。这一整套流程是系统控制的。如果你自己用 Frida 去“强行”创建一个 Activity 实例，系统其实并不知道它存在，所以它无法正常工作。</li>
+</ol>
+<p>那么应该怎么办呢</p>
+<p>SWDD说</p>
+<blockquote>
+<p>当Android应用程序启动时，系统会创建MainActivity的一个实例（或AndroidManifest.xml文件中指定的启动器活动）。创建MainActivity实例是Android应用程序生命周期的一部分。因此，我们可以使用frida获取MainActivity的实例，然后调用flag()方法来获取我们的标志。</p>
+</blockquote>
+<p>让我们看看GPT怎么说</p>
+<blockquote>
+<hr>
+<h2 id="📱-正常来说，Android-应用是怎么启动的？"><a href="#📱-正常来说，Android-应用是怎么启动的？" class="headerlink" title="📱 正常来说，Android 应用是怎么启动的？"></a>📱 正常来说，Android 应用是怎么启动的？</h2><ol>
+<li>当你点击某个 App 图标时，</li>
+<li>Android 系统就会去看这个 App 的 <code>AndroidManifest.xml</code> 文件，</li>
+<li>找到标注为「启动入口」的 Activity（比如 <code>MainActivity</code>），</li>
+<li>然后系统会<strong>自动创建这个 Activity 的实例</strong>，并调用它的一系列生命周期方法（比如 <code>onCreate()</code>、<code>onResume()</code> 等）。</li>
+</ol>
+<hr>
+<h2 id="🧠-那这段话的核心意思就是："><a href="#🧠-那这段话的核心意思就是：" class="headerlink" title="🧠 那这段话的核心意思就是："></a>🧠 那这段话的核心意思就是：</h2><blockquote>
+<p><strong>你自己不用 new 一个 MainActivity，系统已经帮你创建好了！</strong></p>
+</blockquote>
+<p>所以与其自己创建一个可能不完整的实例（会有很多问题），<strong>不如直接去“拿到”系统已经创建的那个实例，然后调用你想要的函数，比如</strong> <strong>​<code>flag()</code>​</strong> ​ <strong>。</strong></p>
+<h2 id="✅-总结一下，通俗点说就是："><a href="#✅-总结一下，通俗点说就是：" class="headerlink" title="✅ 总结一下，通俗点说就是："></a>✅ 总结一下，通俗点说就是：</h2><blockquote>
+<p>“Android 系统会自动帮你创建 MainActivity 的实例，所以你<strong>不需要自己造一个</strong>。用 Frida 可以直接找到这个已经存在的实例，<strong>然后调用你想要的方法（比如</strong> <strong>​<code>flag()</code>​</strong> ​ <strong>）来拿 flag。”</strong></p>
+</blockquote>
+</blockquote>
+<p>有这样一个模板</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-title class_">Java</span>.<span class="hljs-title function_">performNow</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">choose</span>(<span class="hljs-string">&#x27;&lt;包名&gt;.&lt;类名&gt;&#x27;</span>, &#123;<br>    <span class="hljs-attr">onMatch</span>: <span class="hljs-keyword">function</span>(<span class="hljs-params">instance</span>) &#123;<br>      <span class="hljs-comment">// 待办事项</span><br>    &#125;,<br>    <span class="hljs-attr">onComplete</span>: <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) &#123;&#125;<br>  &#125;);<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<ul>
+<li><p><strong>onMatch</strong></p>
+<ul>
+<li>​<code>onMatch</code>回调函数在<code>Java.choose</code>操作期间找到指定类的每个实例时执行。</li>
+<li>这个回调函数接收当前实例作为它的参数。</li>
+<li>您可以在<code>onMatch</code>回调中定义自定义操作，以在每个实例上执行。</li>
+<li>​<code>function(instance) &#123;&#125;</code>，<code>instance</code>参数表示目标类的每个匹配实例。您可以使用任何其他名称。参数 <code>instance</code> 就是这个 MainActivity 的对象，你可以在这里调用它的函数，比如 <code>instance.flag()</code>​</li>
+</ul>
+</li>
+<li><p><strong>onComplete</strong></p>
+<ul>
+<li>​<code>onComplete</code>回调在<code>Java.choose</code>操作完成后执行操作或清理任务。此块是可选的，如果您在搜索完成后不需要执行任何特定操作，则可以选择将其留空。</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p>尝试使用该模板寻找MainActivity实例</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">hook</span>(<span class="hljs-params"></span>) &#123;<br><br>    <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">choose</span>(<span class="hljs-string">&#x27;com.ad2001.frida0x5.MainActivity&#x27;</span>, &#123;<br>        <br>        <span class="hljs-attr">onMatch</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">instance</span>) &#123;<br>            <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Sucess found!!!&quot;</span>);<br>        &#125;,<br>        <span class="hljs-attr">onComplete</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>            <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;end&quot;</span>);<br>        &#125;<br>    &#125;);<br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">perform</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-title function_">hook</span>();<br>    &#125;)<br>&#125;<br><br><span class="hljs-title function_">setImmediate</span>(main);<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250413203112.png" alt="image"></p>
+<p>在这里还发现个问题，当使用如下命令启动frida时，只会打印一个 end ，hook不上，需要重新修改一下脚本（例如注释掉某一行再加上）</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js">frida -U -f com.<span class="hljs-property">ad2001</span>.<span class="hljs-property">frida0x5</span> -l lab05.<span class="hljs-property">js</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250413203858.png" alt="image"></p>
+<p>原因其实跟 0x2 一样，由于脚本是立即注入，app还来不及创建MainActivity实例，自然就没找到</p>
+<p>解决办法也跟 0x2 一样，这里就不再赘述</p>
+<p>‍</p>
+<h2 id="0x6-MainActivity中的非静态方法且参数通过非MainActivity非静态方法传递"><a href="#0x6-MainActivity中的非静态方法且参数通过非MainActivity非静态方法传递" class="headerlink" title="0x6 MainActivity中的非静态方法且参数通过非MainActivity非静态方法传递"></a>0x6 MainActivity中的非静态方法且参数通过非MainActivity非静态方法传递</h2><p>MainActivity中的非静态方法 get_flag ，并且参数是通过 Checker 类对象 A 来传递的</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250413210156.png" alt="image"></p>
+<p>Checker类如下</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250413210311.png" alt="image"></p>
+<p>所以这题就是0x5 0x4 0x3的结合，但是在 0x3 中，变量为静态变量，所以需要这里需要创建一个类的对象来对变量进行更改</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250413210502.png" alt="image"></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">hook</span>(<span class="hljs-params"></span>) &#123;<br><br>    <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">choose</span>(<span class="hljs-string">&quot;com.ad2001.frida0x6.MainActivity&quot;</span>, &#123;<br>        <br>        <span class="hljs-attr">onMatch</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">MainActivity</span>) &#123;<br>            <br>            <span class="hljs-keyword">var</span> c = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;com.ad2001.frida0x6.Checker&quot;</span>)<br>            <span class="hljs-keyword">var</span> A = c.$new();<br><br>            A.<span class="hljs-property">num1</span>.<span class="hljs-property">value</span> = <span class="hljs-number">1234</span>;<br>            A.<span class="hljs-property">num2</span>.<span class="hljs-property">value</span> = <span class="hljs-number">4321</span>;<br><br>            <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;success&quot;</span>);<br>            <span class="hljs-title class_">MainActivity</span>.<span class="hljs-title function_">get_flag</span>(A);<br>        &#125;,<br>        <span class="hljs-attr">onComplete</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>            <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;end&quot;</span>);<br>        &#125;<br>    &#125;);<br><br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br><br>    <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">perform</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-title function_">hook</span>();<br>    &#125;)<br>&#125;<br><br><span class="hljs-comment">// setImmediate(main);</span><br><span class="hljs-built_in">setTimeout</span>(main, <span class="hljs-number">1000</span>);<br></code></pre></td></tr></table></figure>
+
+<p>‍</p>
+<h2 id="0x7-Hook构造函数"><a href="#0x7-Hook构造函数" class="headerlink" title="0x7 Hook构造函数"></a>0x7 Hook构造函数</h2><p>构造函数是 Java 类中的一种特殊方法，它的作用是：<strong>在创建对象的时候用来初始化对象的属性</strong>。</p>
+<p>先举个例子来了解一下森莫是Java中的构造函数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs Java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Dog</span> &#123;<br>    String name;<br>    <span class="hljs-type">int</span> age;<br><br>    <span class="hljs-comment">// 构造函数</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-title function_">Dog</span><span class="hljs-params">(String n, <span class="hljs-type">int</span> a)</span> &#123;<br>        name = n;<br>        age = a;<br>    &#125;<br><br>    <span class="hljs-comment">// 普通方法</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">bark</span><span class="hljs-params">()</span> &#123;<br>        System.out.println(name + <span class="hljs-string">&quot; 汪汪叫！&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">showInfo</span><span class="hljs-params">()</span> &#123;<br>        System.out.println(<span class="hljs-string">&quot;这只狗叫 &quot;</span> + name + <span class="hljs-string">&quot;，它 &quot;</span> + age + <span class="hljs-string">&quot; 岁了。&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>        <span class="hljs-type">Dog</span> <span class="hljs-variable">d</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Dog</span>(<span class="hljs-string">&quot;小黑&quot;</span>, <span class="hljs-number">3</span>);  <span class="hljs-comment">// 调用构造函数，初始化对象       Dog（第一个）👉 表示变量 d 的 类型，也就是类名，说明 d 是一个 Dog 类型的对象。</span><br>                                    <span class="hljs-comment">//new Dog(&quot;小黑&quot;, 3)（后面这个）👉 是 调用构造函数，创建一个新的 Dog 对象，并传入两个参数。</span><br>        d.bark();                   <span class="hljs-comment">// 调用普通方法</span><br>        d.showInfo();               <span class="hljs-comment">// 调用普通方法</span><br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>来看本题，调用了flag方法，并且通过Checker构造函数对 num1 和 num2 赋值为 123 和 321</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250413213132.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250413213246.png" alt="image"></p>
+<p>在Frida中使用 $init 关键字来 hook 构造函数</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">hook</span>(<span class="hljs-params"></span>) &#123;<br><br>    <span class="hljs-keyword">var</span> <span class="hljs-title class_">Checker</span> = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;com.ad2001.frida0x7.Checker&quot;</span>);<br>    <span class="hljs-title class_">Checker</span>.<span class="hljs-property">$init</span>.<span class="hljs-property">implementation</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">a, b</span>) &#123;<br><br>    <span class="hljs-comment">//  Checker.$init 是这个类的 构造函数（constructor）。</span><br>    <span class="hljs-comment">//  .implementation = function (a, b) 表示你要“劫持”这个构造函数，用你自己的实现来替代原来的。</span><br>    <span class="hljs-comment">//  a, b 就是原本传给构造函数的两个参数。</span><br><br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Origin num&quot;</span>, a, b);<br>        <span class="hljs-variable language_">this</span>.$init(<span class="hljs-number">666</span>, <span class="hljs-number">666</span>);    <span class="hljs-comment">//this.$init(...) 表示“用原本的方式继续初始化对象，但用我给的参数”</span><br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;success&quot;</span>);  <br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">perform</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-title function_">hook</span>();<br>    &#125;)<br>&#125;<br><span class="hljs-title function_">setImmediate</span>(main);<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250413215324.png" alt="image"></p>
+<p>写到这我有点好奇如果使用 0x1 的方法直接去 hook 构造函数会怎样</p>
+<p>来吧，实践出真知</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">hook</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">var</span> <span class="hljs-title class_">Ch</span> = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;com.ad2001.frida0x7.Checker&quot;</span>);<br>    <span class="hljs-title class_">Ch</span>.<span class="hljs-property">Checker</span>.<span class="hljs-title function_">overload</span>(<span class="hljs-string">&#x27;int&#x27;</span>, <span class="hljs-string">&#x27;int&#x27;</span>).<span class="hljs-property">implementation</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">a, b</span>) &#123; <br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Origin num&quot;</span>, a, b); <span class="hljs-comment">//console.log打印</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-title class_">Checker</span>(<span class="hljs-number">666</span>, <span class="hljs-number">666</span>);<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">perform</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-title function_">hook</span>();<br>    &#125;)<br>&#125;<br><span class="hljs-title function_">setImmediate</span>(main);<br></code></pre></td></tr></table></figure>
+
+<p>哈哈，报错了，cannot read property ‘overload’ of undefined 说明试图 hook 的 Java 方法并没有找到</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250413215448.png" alt="image"></p>
+<p>然后我又好奇，如果使用 0x3 的方法直接改变 num1 和 num2 会怎样</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250413215954.png" alt="image"></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">hook</span>(<span class="hljs-params"></span>) &#123;<br><br>    <span class="hljs-keyword">var</span> <span class="hljs-title class_">Checker</span> = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;com.ad2001.frida0x7.Checker&quot;</span>);<br>    <span class="hljs-title class_">Checker</span>.<span class="hljs-property">$init</span>.<span class="hljs-property">implementation</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">a, b</span>) &#123;<br><br>    <span class="hljs-comment">//  Checker.$init 是这个类的 构造函数（constructor）。</span><br>    <span class="hljs-comment">//  .implementation = function (a, b) 表示你要“劫持”这个构造函数，用你自己的实现来替代原来的。</span><br>    <span class="hljs-comment">//  a, b 就是原本传给构造函数的两个参数。</span><br><br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Origin num&quot;</span>, a, b);<br>        <span class="hljs-comment">// this.$init(666, 666);    //this.$init(...) 表示“用原本的方式继续初始化对象，但用我给的参数”</span><br>        <span class="hljs-title class_">Checker</span>.<span class="hljs-property">num1</span>.<span class="hljs-property">value</span> = <span class="hljs-number">666</span>;<br>        <span class="hljs-title class_">Checker</span>.<span class="hljs-property">num2</span>.<span class="hljs-property">value</span> = <span class="hljs-number">666</span>;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;success&quot;</span>);<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">perform</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-title function_">hook</span>();<br>    &#125;)<br>&#125;<br><span class="hljs-title function_">setImmediate</span>(main);<br></code></pre></td></tr></table></figure>
+
+<p>哈哈，果然又报错了  Error: Cannot access an instance field without an instance 表示试图访问 <code>Checker.num1</code>，但这是 <strong>实例字段（成员变量）</strong> ，你必须通过一个具体对象（也就是 <code>this</code>）来访问它</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250413220144.png" alt="image"></p>
+<p>改成这样或许会比初代脚本好理解一些，跟 0x1 也更像</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">hook</span>(<span class="hljs-params"></span>) &#123;<br><br>    <span class="hljs-keyword">var</span> <span class="hljs-title class_">Checker</span> = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;com.ad2001.frida0x7.Checker&quot;</span>);<br>    <span class="hljs-title class_">Checker</span>.<span class="hljs-property">$init</span>.<span class="hljs-title function_">overload</span>(<span class="hljs-string">&#x27;int&#x27;</span>, <span class="hljs-string">&#x27;int&#x27;</span>).<span class="hljs-property">implementation</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">a, b</span>) &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Origin num:&quot;</span>, a, b);<br><br>        <span class="hljs-comment">// 调用原始构造函数初始化对象</span><br>        <span class="hljs-variable language_">this</span>.$init(a, b);<br><br>        <span class="hljs-comment">// 修改成员变量</span><br>        <span class="hljs-variable language_">this</span>.<span class="hljs-property">num1</span>.<span class="hljs-property">value</span> = <span class="hljs-number">666</span>;<br>        <span class="hljs-variable language_">this</span>.<span class="hljs-property">num2</span>.<span class="hljs-property">value</span> = <span class="hljs-number">666</span>;<br><br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Success: num1 and num2 changed to 666&quot;</span>);<br>    &#125;;<br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">perform</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-title function_">hook</span>();<br>    &#125;)<br>&#125;<br><span class="hljs-title function_">setImmediate</span>(main);<br></code></pre></td></tr></table></figure>
+
+<p>‍</p>
+<h2 id="0x8-Hook-Native层中调用的函数并且读取传入的参数"><a href="#0x8-Hook-Native层中调用的函数并且读取传入的参数" class="headerlink" title="0x8 Hook Native层中调用的函数并且读取传入的参数"></a>0x8 Hook Native层中调用的函数并且读取传入的参数</h2><p>从本章开始进入 Native层</p>
+<p>模板如下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(targetAddress, &#123;<br>    <span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Entering &#x27;</span> + functionName);<br>        <span class="hljs-comment">// Modify or log arguments if needed</span><br>    &#125;,<br>    <span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Leaving &#x27;</span> + functionName);<br>        <span class="hljs-comment">// Modify or log return value if needed</span><br>    &#125;<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>它的作用是：</p>
+<p><strong>当程序运行到某个特定函数（地址为</strong> <strong>​<code>targetAddress</code>​</strong>​ <strong>）时：</strong></p>
+<ul>
+<li><strong>函数刚进入时（onEnter）</strong> ：打印一句话，说“我进来了”；</li>
+<li><strong>函数执行完返回时（onLeave）</strong> ：再打印一句“我出去了”。</li>
+</ul>
+<p>每行的意思</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(targetAddress, &#123;<br></code></pre></td></tr></table></figure>
+
+<p>用 Frida 的 <code>Interceptor.attach</code> 来<strong>拦截（hook）某个函数地址</strong>。这个地址是你想观察或修改的函数位置（<code>targetAddress</code>）。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Entering &#x27;</span> + functionName);<br>    <span class="hljs-comment">// Modify or log arguments if needed</span><br>&#125;,<br></code></pre></td></tr></table></figure>
+
+<p>当程序刚进入这个函数时，会执行 <code>onEnter</code> 这个回调。<br>你可以：</p>
+<ul>
+<li><p>打印日志（像现在这样打印“正在进入函数”）；</p>
+</li>
+<li><p>查看和修改传入参数（<code>args</code> 是参数列表）。</p>
+<p>‍</p>
+</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Leaving &#x27;</span> + functionName);<br>    <span class="hljs-comment">// Modify or log return value if needed</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>当函数执行完准备返回时，会执行 <code>onLeave</code>。<br>你可以：</p>
+<ul>
+<li>打印返回值；</li>
+<li>修改返回值（<code>retval</code> 是返回值）。</li>
+</ul>
+<p>‍</p>
+<p>需要获取targetAddress我们可以使用如下API</p>
+<ol>
+<li>​<code>Module.enumerateExports()</code><br> 通过调用 Module.enumerateExports()，我们可以获取到导出函数的名称、地址以及其他相关信息。这些信息对于进行函数挂钩、函数跟踪或者调用其他函数都非常有用。</li>
+<li>​<code>Module.getExportByName()</code><br> 当我们知道要查找的导出项的名称但不知道其地址时，可以使用 Module.getExportByName()。通过提供导出项的名称作为参数，这个函数会返回与该名称对应的导出项的地址。</li>
+<li>​<code>Module.findExportByName()</code><br> 这与 Module.getExportByName() 是一样的。唯一的区别在于，如果未找到导出项，Module.getExportByName() 会引发异常，而 Module.findExportByName() 如果未找到导出项则返回 <code>null</code>​</li>
+<li>​<code>Module.getBaseAddress()</code><br> 通过调用 Module.getBaseAddress() 函数，我们可以获取指定模块的基址地址，然后可以基于这个基址地址进行偏移计算，以定位模块内部的特定函数、变量或者数据结构</li>
+<li>​<code>Module.enumerateImports()</code><br> 通过调用 Module.enumerateImports() 函数，我们可以获取到指定模块导入的外部函数或变量的名称、地址以及其他相关信息。</li>
+</ol>
+<p>‍</p>
+<p>使用 Module.enumerateImports(“libfrida0x8.so”) 查看导入表</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250414155153.png" alt="image"></p>
+<p>使用Module.findExportByName(“libc.so”,”strcmp”);来获取strcmp的地址</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250414155318.png" alt="image"></p>
+<p>来看这题</p>
+<p>加载了一个 frida0x8</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250414174714.png" alt="image"></p>
+<p>so文件里有一个 strcmp 函数，第二个参数 s2 就是经过处理后的正确的 flag ，所以我们需要把strcmp函数的第二个参数hook出来</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250414174755.png" alt="image"></p>
+<p>我先按照我自己的想法写了一个脚本</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">hook</span>(<span class="hljs-params"></span>) &#123;<br><br>    <span class="hljs-keyword">var</span> target = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findExportByName</span>(<span class="hljs-string">&quot;libc.so&quot;</span>, <span class="hljs-string">&quot;strcmp&quot;</span>); <span class="hljs-comment">//查找strcmp的地址</span><br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;strcmp addr is :&quot;</span>, target.<span class="hljs-title function_">toString</span>(<span class="hljs-number">16</span>));<br><br>    <span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(target, &#123;<br>        <span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123;<br>            <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title class_">Memory</span>.<span class="hljs-title function_">readUtf8String</span>(args[<span class="hljs-number">1</span>])); <span class="hljs-comment">//打印strcmp的第二个参数</span><br>        &#125;,<br><br>        <span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br>            <br>        &#125;<br>    &#125;)<br>&#125;<br><br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">perform</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-title function_">hook</span>();<br>    &#125;)<br>&#125;<br><span class="hljs-title function_">setImmediate</span>(main);<br></code></pre></td></tr></table></figure>
+
+<p>输出如下</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250414180856.png" alt="image"></p>
+<p>这里其实是因为，我以为我hook的是特定的某一个strcmp，实际上这个 hook 是生效于所有调用 <code>libc.so!strcmp</code> 的地方，无论是 native 调用还是通过 JNI 被 Java 调用的 native 方法，<strong>都会被拦截</strong></p>
+<p>所以导致了这种情况</p>
+<p>所以要加一个判断，当strcmp的第一个参数包含某个数（例如666）时，就打印第二个参数的结果，使我们的目标更加“精确”</p>
+<p>修改脚本如下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">hook</span>(<span class="hljs-params"></span>) &#123;<br><br>    <span class="hljs-keyword">var</span> target = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findExportByName</span>(<span class="hljs-string">&quot;libc.so&quot;</span>, <span class="hljs-string">&quot;strcmp&quot;</span>); <span class="hljs-comment">//查找strcmp的地址</span><br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;strcmp addr is :&quot;</span>, target.<span class="hljs-title function_">toString</span>(<span class="hljs-number">16</span>));<br><br>    <span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(target, &#123;<br>        <span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123; <span class="hljs-comment">//args只是我对参数起的名字，可以改成任何别的</span><br><br>            <span class="hljs-keyword">var</span> input = <span class="hljs-title class_">Memory</span>.<span class="hljs-title function_">readUtf8String</span>(args[<span class="hljs-number">0</span>]);<br><br>            <span class="hljs-keyword">if</span> (input.<span class="hljs-title function_">includes</span>(<span class="hljs-string">&quot;666&quot;</span>)) &#123;<br>                <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title class_">Memory</span>.<span class="hljs-title function_">readUtf8String</span>(args[<span class="hljs-number">1</span>])); <span class="hljs-comment">//打印strcmp的第二个参数</span><br>            &#125;<br>            <br>        &#125;,<br><br>        <span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br>            <br>        &#125;<br>    &#125;)<br>&#125;<br><br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">perform</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-title function_">hook</span>();<br>    &#125;)<br>&#125;<br><span class="hljs-title function_">setImmediate</span>(main);<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在 Frida 中：</p>
+<ul>
+<li><p>​<code>Memory</code> 是 Frida 的一个全局对象，提供了访问目标进程内存的方法。</p>
+</li>
+<li><p>它可以用来：</p>
+<ul>
+<li>读取内存（如 <code>Memory.readUtf8String(ptr)</code>、<code>Memory.readByteArray(ptr, size)</code>）</li>
+<li>写入内存（如 <code>Memory.writeUtf8String(ptr, &quot;hello&quot;)</code>）</li>
+</ul>
+</li>
+</ul>
+<p>你用的 <code>Memory.readUtf8String()</code> 是它最常用的函数之一，专门处理 C 字符串（以 null 结尾的 UTF-8 字符串）。</p>
+</blockquote>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250414181913.png" alt="image"></p>
+<p>‍</p>
+<h2 id="0x9-Hook-Native层函数的返回值"><a href="#0x9-Hook-Native层函数的返回值" class="headerlink" title="0x9 Hook Native层函数的返回值"></a>0x9 Hook Native层函数的返回值</h2><p>check_flag的值如果是1337就打印flag</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250414190811.png" alt="image"></p>
+<p>native层中的该函数的返回值是1</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250414190831.png" alt="image"></p>
+<p>修改该函数的返回值即可</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">hook</span>(<span class="hljs-params"></span>) &#123;<br><br>    <span class="hljs-keyword">var</span> target = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">enumerateExports</span>(<span class="hljs-string">&quot;liba0x9.so&quot;</span>)[<span class="hljs-number">0</span>][<span class="hljs-string">&quot;address&quot;</span>];<br><br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;addr is :&quot;</span>, target);<br><br>    <span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(target, &#123;<br>        <span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123;    <br>        &#125;,<br><br>        <span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br><br>            <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Origin retval is :&quot;</span>, retval);<br>            retval.<span class="hljs-title function_">replace</span>(<span class="hljs-number">1337</span>);<br>        &#125;<br>    &#125;)<br>&#125;<br><br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">perform</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-title function_">hook</span>();<br>    &#125;)<br>&#125;<br><span class="hljs-title function_">setImmediate</span>(main);<br></code></pre></td></tr></table></figure>
+
+<p>思考：</p>
+<p>这一句</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> target = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">enumerateExports</span>(<span class="hljs-string">&quot;liba0x9.so&quot;</span>)[<span class="hljs-number">0</span>][<span class="hljs-string">&quot;address&quot;</span>];<br></code></pre></td></tr></table></figure>
+
+<p>在 0x8 中使用的是</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> target = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findExportByName</span>(<span class="hljs-string">&quot;libc.so&quot;</span>, <span class="hljs-string">&quot;strcmp&quot;</span>);<br></code></pre></td></tr></table></figure>
+
+<p>我的猜想是，在 0x8 中，我们使用</p>
+<p>Module.enumerateImports(“libfrida0x8.so”)查看导入表，而在该题目中，由于hook的是自己的函数，所以需要使用Module.enumerateExports(“liba0x9.so”)查看导出表</p>
+<blockquote>
+<ul>
+<li><strong>导入表（Imports）</strong> ：<br>是这个库 <strong>调用别人的函数</strong>，通常是系统函数，比如 <code>libc.so</code> 里的 <code>malloc</code>、<code>printf</code>、<code>strlen</code> 等。</li>
+<li><strong>导出表（Exports）</strong> ：<br>是这个库 <strong>暴露给别人用的函数</strong>，很多时候是你自己写的，比如 <code>Java_com_example_myapp_NativeMethod</code> 这种 native 接口，或者一些插件调用的入口函数。</li>
+</ul>
+</blockquote>
+<p>查看导出表</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250414191954.png" alt="image"></p>
+<p>尝试改成跟 0x8 中差不多的写法</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> target = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findExportByName</span>(<span class="hljs-string">&quot;liba0x9.so&quot;</span>, <span class="hljs-string">&quot;Java_com_ad2001_a0x9_MainActivity_check_1flag&quot;</span>);<br></code></pre></td></tr></table></figure>
+
+<p>好吧这样也可以，实践出真知了</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250414192036.png" alt="image"></p>
+<p>还是解释一下这一句吧</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> target = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">enumerateExports</span>(<span class="hljs-string">&quot;liba0x9.so&quot;</span>)[<span class="hljs-number">0</span>][<span class="hljs-string">&quot;address&quot;</span>];<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<ul>
+<li><p>​<code>Module.enumerateExports(&quot;liba0x9.so&quot;)</code><br>这会列出 <code>liba0x9.so</code> 这个 native 库里导出的所有函数（也就是那些对外开放可以调用的函数），返回一个包含信息的数组，比如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs js">[<br>  &#123;<span class="hljs-attr">name</span>: <span class="hljs-string">&quot;check_flag&quot;</span>, <span class="hljs-attr">address</span>: <span class="hljs-title function_">ptr</span>(<span class="hljs-string">&quot;0x12345678&quot;</span>), <span class="hljs-attr">type</span>: <span class="hljs-string">&quot;function&quot;</span>&#125;,<br>  &#123;<span class="hljs-attr">name</span>: <span class="hljs-string">&quot;init&quot;</span>, <span class="hljs-attr">address</span>: <span class="hljs-title function_">ptr</span>(<span class="hljs-string">&quot;0x12345690&quot;</span>), <span class="hljs-attr">type</span>: <span class="hljs-string">&quot;function&quot;</span>&#125;,<br>  ...<br>]<br></code></pre></td></tr></table></figure></li>
+<li><p>​<code>[0][&quot;address&quot;]</code><br>表示取这个导出函数列表里的<strong>第一个函数的地址</strong>，也就是 <code>check_flag</code> 的地址（假设第一个刚好是它）。这一行把这个地址赋值给 <code>check_flag</code> 变量。[0]表示索引</p>
+</li>
+</ul>
+</blockquote>
+<p>‍</p>
+<h2 id="0xA-Hook-Native层未被调用的方法"><a href="#0xA-Hook-Native层未被调用的方法" class="headerlink" title="0xA Hook Native层未被调用的方法"></a>0xA Hook Native层未被调用的方法</h2><p>从本章开始使用模拟器会闪退，这里使用的环境是Redmi K60 安卓14 已ROOT</p>
+<p>可以使用如下模板</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> native_adr = <span class="hljs-keyword">new</span> <span class="hljs-title class_">NativePointer</span>(&lt;address_of_the_native_function&gt;);<br><span class="hljs-keyword">const</span> native_function = <span class="hljs-keyword">new</span> <span class="hljs-title class_">NativeFunction</span>(native_adr, <span class="hljs-string">&#x27;&lt;return type&gt;&#x27;</span>, [<span class="hljs-string">&#x27;argument_data_type&#x27;</span>]);<br><span class="hljs-title function_">native_function</span>(&lt;<span class="hljs-variable language_">arguments</span>&gt;);<br></code></pre></td></tr></table></figure>
+
+<p>‍</p>
+<p>让我们来逐行解释一下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> native_adr = <span class="hljs-keyword">new</span> <span class="hljs-title class_">NativePointer</span>(&lt;address_of_the_native_function&gt;);<br></code></pre></td></tr></table></figure>
+
+<p>这一句的意思是，我们知道一个原生函数在内存中的地址（比如 0x12345678），把它封装成一个 <code>NativePointer</code> 类型的对象，好让 Frida 能识别这个地址。<code>&lt;address_of_the_native_function&gt;</code> 是手动填进去的地址，通常是通过逆向分析（IDA、Frida hook 等）找到的函数地址。</p>
+<p>‍</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> native_function = <span class="hljs-keyword">new</span> <span class="hljs-title class_">NativeFunction</span>(native_adr, <span class="hljs-string">&#x27;&lt;return type&gt;&#x27;</span>, [<span class="hljs-string">&#x27;argument_data_type&#x27;</span>]);<br></code></pre></td></tr></table></figure>
+
+<p>这一行的意思是，把这个地址（native_adr）对应的函数转换成 JavaScript 能调用的函数。</p>
+<ul>
+<li>​<code>&lt;return type&gt;</code> 表示这个函数的返回值类型，比如 <code>&#39;int&#39;</code>、<code>&#39;void&#39;</code>、<code>&#39;pointer&#39;</code> 等。</li>
+<li>​<code>[&#39;argument_data_type&#39;]</code> 表示这个函数的参数类型列表，比如 <code>[&#39;int&#39;, &#39;pointer&#39;]</code>。</li>
+</ul>
+<p>所以这一行的作用是：<strong>用 Frida 的</strong> <strong>​<code>NativeFunction</code>​</strong> <strong>包装原生函数，让你可以像普通 JS 函数那样去调用它。</strong></p>
+<p>‍</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-title function_">native_function</span>(&lt;<span class="hljs-variable language_">arguments</span>&gt;);<br></code></pre></td></tr></table></figure>
+
+<p>最后直接调用这个原生函数，传入你需要的参数（这些参数要和上面声明的参数类型匹配）</p>
+<p>现在来看看例题</p>
+<p>Java层并不能看到什么有用的，只是加载了<code>stringFromJNI()</code>​</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250415201736.png" alt="image"></p>
+<p>我们来看看native层，stringFromJNI也没什么有用的信息，但是有一个get_flag函数可以打印flag</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250415201824.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250415201847.png" alt="image"></p>
+<p>于是思路就是，利用上面的模板 hook 出get_flag函数</p>
+<p>模仿 0x9 中使用 Module.enumerateExports(“libfrida0xa.so”) 查看导出表，发现导出表非常之长，直接使用var target &#x3D; Module.enumerateExports(“liba0x9.so”)[0][“address”];进行索引会有点麻烦，所以我们换一种方法</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250415203957.png" alt="image"></p>
+<p>由于ALSR（地址随机化）的问题，所以我们先使用<code>Module.findBaseAddress(&quot;libfrida0xa.so&quot;);</code>查看一下基地址</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250415203452.png" alt="image"></p>
+<p>可以构造如下循环</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> base_addr = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findBaseAddress</span>(<span class="hljs-string">&quot;libfrida0xa.so&quot;</span>);<br> 	<span class="hljs-keyword">var</span> <span class="hljs-built_in">exports</span> = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">enumerateExports</span>(<span class="hljs-string">&quot;libfrida0xa.so&quot;</span>);<br><br>   <span class="hljs-keyword">var</span> target = <span class="hljs-literal">null</span>;<br><br><span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; <span class="hljs-built_in">exports</span>[i] != <span class="hljs-literal">null</span>; i++)&#123;<br>       <br>       <span class="hljs-keyword">if</span> (<span class="hljs-built_in">exports</span>[i][<span class="hljs-string">&quot;name&quot;</span>] == <span class="hljs-string">&quot;_Z8get_flagii&quot;</span>) &#123;<br><br>           <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;function get_flag : &quot;</span>, <span class="hljs-built_in">exports</span>[i][<span class="hljs-string">&quot;address&quot;</span>]);<br>           <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>((<span class="hljs-built_in">exports</span>[i][<span class="hljs-string">&quot;address&quot;</span>] - base_addr).<span class="hljs-title function_">toString</span>(<span class="hljs-number">16</span>));<br><br>           target = <span class="hljs-built_in">exports</span>[i][<span class="hljs-string">&quot;address&quot;</span>];<br><br>       &#125;<br><br>   &#125;<br></code></pre></td></tr></table></figure>
+
+<p>这里我们找到基地址后，遍历导出表，如果在导出表中找到了 get_flag 函数，就打印出 get_flag 函数的绝对地址</p>
+<p>同时由于我们知道了绝对地址和基地址，于是我们就可以顺便把偏移地址也打印出来</p>
+<p>偏移 &#x3D; 函数地址 - 模块基地址</p>
+<p>这样我们就找到了我们需要 hook 的目标函数的地址</p>
+<p>‍</p>
+<p>这里还有个问题，为什么 get_flag 要写成 “_Z8get_flagii” 呢</p>
+<p>这其实是C++ 的 <strong>name mangling（名字改编 &#x2F; 名字重整）问题</strong></p>
+<p>什么是 Name Mangling？</p>
+<p>在 <strong>C++ 中</strong>，函数名会被编译器<strong>自动改写</strong>成一串带有额外信息的名字，称为 <strong>mangled name（重整名字）</strong> 。</p>
+<p>这是因为 <strong>C++ 支持函数重载（同名函数，不同参数）</strong> ，而汇编语言、链接器、操作系统等底层东西并不支持这一特性。</p>
+<p>举个例子：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">add</span><span class="hljs-params">(<span class="hljs-type">int</span> a, <span class="hljs-type">int</span> b)</span></span>;<br><span class="hljs-function"><span class="hljs-type">float</span> <span class="hljs-title">add</span><span class="hljs-params">(<span class="hljs-type">float</span> a, <span class="hljs-type">float</span> b)</span></span>;<br></code></pre></td></tr></table></figure>
+
+<p>这两个函数在 C++ 中是合法的，因为它们参数不同。但如果你不做 name mangling，它们在汇编&#x2F;符号表里都叫 <code>add</code>，系统就不知道你到底想调用哪个。</p>
+<p>所以编译器会把它们改名：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-type">int</span> <span class="hljs-keyword">add</span>(<span class="hljs-type">int</span>, <span class="hljs-type">int</span>)       <span class="hljs-comment">--&gt; _Z3addii</span><br><span class="hljs-type">float</span> <span class="hljs-keyword">add</span>(<span class="hljs-type">float</span>, <span class="hljs-type">float</span>) <span class="hljs-comment">--&gt; _Z3addff</span><br></code></pre></td></tr></table></figure>
+
+<p>这就是 name mangling。</p>
+<p>由于我们主要研究frida hook，这个问题就不过多赘述</p>
+<p>‍</p>
+<p>回归正题，知道了我们的目标地址后就可以直接写脚本啦，利用上面的模板</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">hook</span>(<span class="hljs-params"></span>) &#123;<br><br>    <span class="hljs-keyword">var</span> base_addr = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findBaseAddress</span>(<span class="hljs-string">&quot;libfrida0xa.so&quot;</span>);<br>    <span class="hljs-keyword">var</span> <span class="hljs-built_in">exports</span> = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">enumerateExports</span>(<span class="hljs-string">&quot;libfrida0xa.so&quot;</span>);<br><br>    <span class="hljs-keyword">var</span> target = <span class="hljs-literal">null</span>;<br><br>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; <span class="hljs-built_in">exports</span>[i] != <span class="hljs-literal">null</span>; i++)&#123;<br>        <br>        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">exports</span>[i][<span class="hljs-string">&quot;name&quot;</span>] == <span class="hljs-string">&quot;_Z8get_flagii&quot;</span>) &#123;<br><br>            <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;function get_flag : &quot;</span>, <span class="hljs-built_in">exports</span>[i][<span class="hljs-string">&quot;address&quot;</span>]);<br>            <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;base addr is:&quot;</span>, (<span class="hljs-built_in">exports</span>[i][<span class="hljs-string">&quot;address&quot;</span>] - base_addr).<span class="hljs-title function_">toString</span>(<span class="hljs-number">16</span>));<br><br>            target = <span class="hljs-built_in">exports</span>[i][<span class="hljs-string">&quot;address&quot;</span>];<br><br>        &#125;<br><br>    &#125;<br><br>    <span class="hljs-keyword">var</span> get_flag_ptr = <span class="hljs-keyword">new</span> <span class="hljs-title class_">NativePointer</span>(target);<br>    <span class="hljs-keyword">const</span> <span class="hljs-title class_">My</span>_get_flag = <span class="hljs-keyword">new</span> <span class="hljs-title class_">NativeFunction</span>(get_flag_ptr, <span class="hljs-string">&#x27;char&#x27;</span>, [<span class="hljs-string">&#x27;int&#x27;</span>, <span class="hljs-string">&#x27;int&#x27;</span>]);<br><br><br>    <span class="hljs-keyword">var</span> flag = <span class="hljs-title class_">My</span>_get_flag(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>);<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(flag);<br><br><br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">perform</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-title function_">hook</span>();<br>    &#125;)<br>&#125;<br><br><span class="hljs-title function_">setImmediate</span>(main)<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250415211743.png" alt="image"></p>
+<p>由于打印出的是函数的返回值，而且so文件中使用的函数是__android_log_print，所以flag在logcat中可以看到</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250415211847.png" alt="image"></p>
+<p>思考：能否直接在frida面板中打印出flag？</p>
+<p>有的兄弟，有的</p>
+<p>还记得lab0x8的内容吗，我们可以Hook <code>__android_log_print</code>这个函数，直接截获 flag</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250415212343.png" alt="image"></p>
+<p>flag的内容是<code>__android_log_print</code>的第四个参数，所以我们直接读取它的第四个参数然后打印出来就行</p>
+<p>完整hook并打印flag的脚本如下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">hook</span>(<span class="hljs-params"></span>) &#123;<br><br>    <span class="hljs-keyword">var</span> base_addr = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findBaseAddress</span>(<span class="hljs-string">&quot;libfrida0xa.so&quot;</span>);<br>    <span class="hljs-keyword">var</span> <span class="hljs-built_in">exports</span> = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">enumerateExports</span>(<span class="hljs-string">&quot;libfrida0xa.so&quot;</span>);<br><br>    <span class="hljs-keyword">var</span> target = <span class="hljs-literal">null</span>;<br><br>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; <span class="hljs-built_in">exports</span>[i] != <span class="hljs-literal">null</span>; i++)&#123;<br>        <br>        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">exports</span>[i][<span class="hljs-string">&quot;name&quot;</span>] == <span class="hljs-string">&quot;_Z8get_flagii&quot;</span>) &#123;<br><br>            <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;function get_flag : &quot;</span>, <span class="hljs-built_in">exports</span>[i][<span class="hljs-string">&quot;address&quot;</span>]);<br>            <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;base addr is:&quot;</span>, (<span class="hljs-built_in">exports</span>[i][<span class="hljs-string">&quot;address&quot;</span>] - base_addr).<span class="hljs-title function_">toString</span>(<span class="hljs-number">16</span>));<br><br>            target = <span class="hljs-built_in">exports</span>[i][<span class="hljs-string">&quot;address&quot;</span>];<br><br>        &#125;<br><br>    &#125;<br><br>    <span class="hljs-keyword">var</span> get_flag_ptr = <span class="hljs-keyword">new</span> <span class="hljs-title class_">NativePointer</span>(target);<br>    <span class="hljs-keyword">const</span> <span class="hljs-title class_">My</span>_get_flag = <span class="hljs-keyword">new</span> <span class="hljs-title class_">NativeFunction</span>(get_flag_ptr, <span class="hljs-string">&#x27;char&#x27;</span>, [<span class="hljs-string">&#x27;int&#x27;</span>, <span class="hljs-string">&#x27;int&#x27;</span>]);<br><br>    <span class="hljs-keyword">var</span> print_addr = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">findExportByName</span>(<span class="hljs-literal">null</span>, <span class="hljs-string">&quot;__android_log_print&quot;</span>); <span class="hljs-comment">//hook __android_log_print函数</span><br>    <span class="hljs-title class_">Interceptor</span>.<span class="hljs-title function_">attach</span>(print_addr, &#123;<br>        <br>        <span class="hljs-attr">onEnter</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) &#123;<br>            <br>            <span class="hljs-keyword">var</span> flagPtr = args[<span class="hljs-number">3</span>];<br>            <span class="hljs-keyword">var</span> flag = flagPtr.<span class="hljs-title function_">readCString</span>();<br>            <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(flag); <span class="hljs-comment">//读取并打印flag内容</span><br>        &#125;,<br><br>        <span class="hljs-attr">onLeave</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">retval</span>) &#123;<br>            <br>        &#125;<br>    &#125;);<br><br>    <span class="hljs-keyword">var</span> flag = <span class="hljs-title class_">My</span>_get_flag(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>);<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(flag);<br><br><br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">perform</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-title function_">hook</span>();<br>    &#125;)<br>&#125;<br><br><span class="hljs-title function_">setImmediate</span>(main)<br></code></pre></td></tr></table></figure>
+
+<p>‍</p>
+<h2 id="0xB-更改Native层的汇编指令"><a href="#0xB-更改Native层的汇编指令" class="headerlink" title="0xB 更改Native层的汇编指令"></a>0xB 更改Native层的汇编指令</h2><p>先来看x86下的模板</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> writer = <span class="hljs-keyword">new</span> <span class="hljs-title function_">X86Writer</span>(opcodeaddr);<br><span class="hljs-title class_">Memory</span>.<span class="hljs-title function_">protect</span>(opcodeaddr, <span class="hljs-number">0x1000</span>, <span class="hljs-string">&quot;rwx&quot;</span>);<br><span class="hljs-keyword">try</span> &#123;<br> <br>  writer.<span class="hljs-title function_">flush</span>();<br> <br>&#125; <span class="hljs-keyword">finally</span> &#123;<br> <br>  writer.<span class="hljs-title function_">dispose</span>();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>我们来解释一下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">var</span> writer = <span class="hljs-keyword">new</span> <span class="hljs-title function_">X86Writer</span>(opcodeaddr);<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>创建了一个写指令的“写手”对象，叫 <code>writer</code>。</li>
+<li>​<code>X86Writer</code> 是 Frida 提供的一个类，用来向指定内存地址写入 x86 汇编指令。</li>
+<li>​<code>opcodeaddr</code> 是你想修改的地址，比如某个函数开头或者中间的指令地址。</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js">emory.<span class="hljs-title function_">protect</span>(opcodeaddr, <span class="hljs-number">0x1000</span>, <span class="hljs-string">&quot;rwx&quot;</span>);<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>把从 <code>opcodeaddr</code> 开始的一段内存（大小为 <code>0x1000</code> 字节，也就是一页）设置为可读（r）、可写（w）、可执行（x）。</li>
+<li>默认情况下，程序的代码区域一般是只读的；要想修改它，就得先把它“解锁”。</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">try</span> &#123; writer.<span class="hljs-title function_">flush</span>(); &#125;<br></code></pre></td></tr></table></figure>
+
+<p>try块中我们可以插入要修改&#x2F;添加的x86指令。X86Writer实例提供了各种方法来插入各种x86指令。</p>
+<p>​<code>writer.flush();</code>​</p>
+<ul>
+<li>插入指令后，调用<code>flush</code>方法将更改应用到内存中。这确保修改后的指令被写入内存位置。</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">finally</span> &#123; writer.<span class="hljs-title function_">dispose</span>(); &#125;<br></code></pre></td></tr></table></figure>
+
+<p>最后无论是否出错，都调用 <code>dispose()</code> 来释放资源。否则可能会造成内存泄漏</p>
+<p>对于x86而言，我们可以查阅如下文档</p>
+<p><a target="_blank" rel="noopener" href="https://frida.re/docs/javascript-api/#x86writer">JavaScript API | Frida • A world-class dynamic instrumentation toolkit</a></p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250415215645.png" alt="image"></p>
+<p>对于arm64而言，我们可以查阅如下文档</p>
+<p><a target="_blank" rel="noopener" href="https://frida.re/docs/javascript-api/#arm64writer">JavaScript API | Frida • A world-class dynamic instrumentation toolkit</a></p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250415215657.png" alt="image"></p>
+<p>接下来让我们看看例题，使用的架构为arm64架构</p>
+<p>Java层依旧是什么都没有</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250415215808.png" alt="image"></p>
+<p>native层中的MainActivity伪代码界面什么都没有，很明显这不正常</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250415215843.png" alt="image"></p>
+<p>看看控制流，发现这里构成了一个永假跳转指令，导致我们的IDA反编译出错</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250415215932.png" alt="image"></p>
+<p>那么，我们直接nop掉这个B.NE即可</p>
+<p>IDA查看偏移地址是在0x15248处</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250415220023.png" alt="image"></p>
+<p>开始hook</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">hook</span>(<span class="hljs-params"></span>) &#123;<br><br>    <span class="hljs-keyword">var</span> base_addr = <span class="hljs-title class_">Module</span>.<span class="hljs-title function_">getBaseAddress</span>(<span class="hljs-string">&quot;libfrida0xb.so&quot;</span>);<br><br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Base address : &quot;</span>, base_addr);<br>    <span class="hljs-keyword">var</span> BNE_addr = base_addr.<span class="hljs-title function_">add</span>(<span class="hljs-number">0x15248</span>);<br><br>    <span class="hljs-title class_">Memory</span>.<span class="hljs-title function_">protect</span>(base_addr, <span class="hljs-number">0x1000</span>, <span class="hljs-string">&quot;rwx&quot;</span>);<br><br>    <span class="hljs-keyword">var</span> writer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Arm64Writer</span>(BNE_addr);<br><br>    <span class="hljs-keyword">try</span> &#123;<br>        writer.<span class="hljs-title function_">putNop</span>();<br>        writer.<span class="hljs-title function_">flush</span>();<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Success!!&quot;</span>);<br>    &#125; <span class="hljs-keyword">finally</span> &#123;<br>        writer.<span class="hljs-title function_">dispose</span>();<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">perform</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-title function_">hook</span>();<br>    &#125;)<br>&#125;<br><br><span class="hljs-built_in">setTimeout</span>(main, <span class="hljs-number">1000</span>);<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250415220406.png" alt="image"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250415220417.png" alt="image"></p>
+<p>同样是需要到logcat中查看flag</p>
+<p><img src="https://cdn.jsdelivr.net/gh/F10ower/img@main/img/20250415220448.png" alt="image"></p>
+<p>‍</p>
+<p>‍</p>
+<p>‍</p>
+<p>‍</p>
+<p>‍</p>
+<p>‍</p>
+<p>‍</p>
+<p>‍</p>
+<p>‍</p>
+<p>‍</p>
+<p>‍</p>
+<p>‍</p>
+
+      </div>
+    </div>
+    
+      <script src='https://unpkg.com/mermaid@latest/dist/mermaid.min.js'></script>
+      <script>
+        if (window.mermaid) {
+          mermaid.initialize({"startOnload":true});
+        }
+      </script>
+    
+  </article>
+  <div class="post__foot">
+    
+    <div class="post-nav">
+  
+    <a class="post-nav-item-left" href="/2024/07/25/%E4%B8%B4%E6%B1%9F%E4%BB%99/">
+      <div class="text-align">
+        <svg t="1670570876164"
+             class="icon"
+             viewBox="0 0 1024 1024"
+             width="16"
+             height="16">
+          <path d="M384 512L731.733333 202.666667c17.066667-14.933333 19.2-42.666667 4.266667-59.733334-14.933333-17.066667-42.666667-19.2-59.733333-4.266666l-384 341.333333c-10.666667 8.533333-14.933333 19.2-14.933334 32s4.266667 23.466667 14.933334 32l384 341.333333c8.533333 6.4 19.2 10.666667 27.733333 10.666667 12.8 0 23.466667-4.266667 32-14.933333 14.933333-17.066667 14.933333-44.8-4.266667-59.733334L384 512z" p-id="14596" />
+        </svg>
+        <span class="text-small">上一篇</span>
+      </div>
+      <div>临江仙</div>
+    </a>
+  
+  <div class="vhr"></div>
+  
+    <div class="post-nav-item-right"></div>
+  
+</div>
+
+    
+      <div class="related-post">
+  <div class="related__head">
+  <a href="/tags/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/" class="post-tag">#移动安全</a>
+
+</div>
+  <div class="realated__body">
+    
+      <div class="null"><div class="null-item"><div class="null-title"><a href="\2025\07\25\360加固保免费版\" title="360加固保免费版分析" rel="bookmark">360加固保免费版分析</a></div></div><div class="null-item"><div class="null-title"><a href="\2025\10\15\Native函数注册\" title="安卓Native层函数注册" rel="bookmark">安卓Native层函数注册</a></div></div><div class="null-item"><div class="null-title"><a href="\2024\07\25\DASCTF2024夏季挑战赛-StrangePrograme\" title="[DASCTF2024夏季挑战赛]StrangePrograme" rel="bookmark">[DASCTF2024夏季挑战赛]StrangePrograme</a></div></div></div>
+    
+  </div>
+</div>
+
+    
+    
+  </div>
+
+    </div>
+    <div class="foot">
+      <div class="foot-inner">
+        <div class="foot__head">
+          
+            <div class="foot-line">
+              <div class="matts">古</div><div class="matts">今</div><div class="matts">多</div><div class="matts">少</div><div class="matts">事</div>
+            </div>
+          
+            <div class="foot-line">
+              <div class="matts">都</div><div class="matts">付</div><div class="matts">笑</div><div class="matts">谈</div><div class="matts">中</div>
+            </div>
+          
+        </div>
+        <div class="foot__body">
+          
+            <div class="foot-item">
+              <div class="foot-item__head">朋友</div>
+              <div class="foot-item__body">
+                
+                  <div class="text">
+                    <img alt="link" height="20px" width="20px" src="/images/icon/icon-link.svg" />
+                    <a class="foot-link" target="_blank" rel="noopener" href="https://fairy-10124.github.io">槐序十七</a>
+                  </div>
+                
+                <div class="text">
+                  <img alt="link" height="20px" width="20px" src="/images/icon/icon-link+.svg" />
+                  <a class="foot-link"
+                     href="mailto:nr38six@foxmail.com?subject=%E7%94%B3%E8%AF%B7%20Hozen.site%20%E7%9A%84%E5%8F%8B%E9%93%BE%E4%BD%8D%E7%BD%AE">
+                  申请友链</a>
+                </div>
+              </div>
+            </div>
+          
+          
+          <div class="foot-item">
+            <div class="foot-item__head">联系</div>
+            <div class="foot-item__body">
+              <div class="text">
+                <img alt="link" height="20px" width="20px" src="/images/icon/icon-email.svg" />
+                <a class="foot-link" href="mailto:nr38six@foxmail.com">nr38six@foxmail.com</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="copyright">
+          <a href="http://f10ower.github.io">临江仙的花间阁</a> &nbsp;|&nbsp;由&nbsp;<a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>&nbsp;及&nbsp;
+          <svg width="20" height="20" viewBox="0 0 725 725">
+            <path fill-rule="evenodd" fill="rgb(221, 221, 221)" d="M145.870,236.632 L396.955,103.578 L431.292,419.44 L156.600,522.53 L145.870,236.632 Z" />
+            <path fill-rule="evenodd" fill="rgb(159, 159, 159)" d="M396.955,103.578 L564.345,234.486 L611.558,513.469 L431.292,419.44 L396.955,103.578 Z" />
+            <path fill-rule="evenodd" fill="rgb(0, 0, 0)" d="M431.292,419.44 L611.558,513.469 L358.327,595.18 L156.600,522.53 L431.292,419.44 Z" />
+          </svg>
+          <a target="_blank" rel="noopener" href="https://github.com/hooozen/hexo-theme-tranquility">致远</a>&nbsp;驱动
+        </div>
+      </div>
+    </div>
+    
+    
+      <script src="/js/search.js"></script>
+      <script>searchInitialize("/search.json")</script>
+    
+    
+  
+
+  </body>
+</html>
